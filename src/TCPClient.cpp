@@ -17,27 +17,21 @@
 /**********************************************************************************************
  * TCPClient (constructor) - Creates a Stdin file descriptor to simplify handling of user input. 
  *
- **********************************************************************************************/
-
-TCPClient::TCPClient() : Client(){
-}
+**********************************************************************************************/
+TCPClient::TCPClient() : Client(){}
 
 /**********************************************************************************************
  * TCPClient (destructor) - No cleanup right now
  *
- **********************************************************************************************/
-
-TCPClient::~TCPClient() {
-
-}
+**********************************************************************************************/
+TCPClient::~TCPClient() {}
 
 /**********************************************************************************************
  * connectTo - Opens a File Descriptor socket to the IP address and port given in the
  *             parameters using a TCP connection.
  *
  *    Throws: socket_error exception if failed. socket_error is a child class of runtime_error
- **********************************************************************************************/
-
+**********************************************************************************************/
 void TCPClient::connectTo(const char *ip_addr, unsigned short port) {
     // Create the socket for the client
     this->client_sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -69,35 +63,36 @@ void TCPClient::connectTo(const char *ip_addr, unsigned short port) {
  *                    on the socket and sends it.
  * 
  *    Throws: socket_error for recoverable errors, runtime_error for unrecoverable types
- **********************************************************************************************/
-
+**********************************************************************************************/
 void TCPClient::handleConnection() {
-    // Read in a message  and just echo it for now
+    // Used in the main loop of the client connection
+    std::string data; 
+
+    // Read in the welcome message that the server sends upon connection
     this->valread = read (client_sock, buf, 1024);
     buf[this->valread] = '\0';
     std::cout << buf << std::endl;
 
-    this->valread = 0;
-    char hello[100] = "This is the client";
-    send(this->client_sock, hello, strlen(hello), 0);
-    std::cout << "message sent" << std::endl;
-    this->valread = read (this->client_sock, buf, 1024);
-    buf[this->valread] = '\0';
-    std::cout << buf << std::endl; 
-
+    // Main loop to handle the rest of the client session: 
     while(1){
-        std::cout << ">";
-        std::string data;
+        // I like to have this here to let the client know they can type now
+        std::cout << ">"; 
+        // Get input from client
         getline(std::cin, data);
-        if(data == "quit"){
+        // Check to see if the client wants to close the connection
+        if(data == "exit"){
             send(this->client_sock, data.c_str(), strlen(data.c_str()), 0);
+            std::cout << "Closing connection" << std::endl;
+            close(this->client_sock); // Don't forget to close the socket
             break;
+        } else if (data == ""){
+            data = "wrong";
         }
         send(this->client_sock, data.c_str(), strlen(data.c_str()), 0); 
-        std::cout << "message sent" << std::endl;
+        //std::cout << "message sent" << std::endl;
         this->valread = read (this->client_sock, buf, 1024);
         buf[this->valread] = '\0';
-        std::cout << buf << std::endl;
+        std::cout << "From server: " << buf << std::endl;
     }
 }
 
@@ -105,10 +100,9 @@ void TCPClient::handleConnection() {
  * closeConnection - Your comments here
  *
  *    Throws: socket_error for recoverable errors, runtime_error for unrecoverable types
- **********************************************************************************************/
-
+**********************************************************************************************/
 void TCPClient::closeConn() {
-    close(this->client_sock);
+    close(this->client_sock); 
 }
 
 

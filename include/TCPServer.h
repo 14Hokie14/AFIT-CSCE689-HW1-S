@@ -33,14 +33,30 @@ public:
    // Helper method to send messages on a connected server socket
    void sockSend(int sock, const char* msg);
 
-   // Helper method that just reads in a message and echos the message
+   // Helper method that just reads in a message and echos the message, probably won't
+   // be used in final submission, but was a stepping stone
    void readEcho();
 
    // Helper method that checks to see if the passed in buffer says quit
    int quitCheck(const char *buffer);
 
-   // Helper method to 0 out buf
+   // Helper method to clear out buf, set everything to '\0'
    void zeroBuf();
+
+   // Helper method for listen call
+   void serverListen();
+
+   // Helper method for select call, puts return value of the select() call into this->select_result
+   void serverSelect();
+
+   // Helper function that will handle accepting a new client to our server
+   void handleNewClient();
+   
+   // Helper function that will handle data from an existing client
+   void handleExistingClient(int i);
+
+   // Helper function that will parse passed in data from a client and send data back to the client
+   void parseData(int i);
 
    // Given methods to implement:
    void bindSvr(const char *ip_addr, unsigned short port);
@@ -61,18 +77,51 @@ private:
 
    std::string initMessage = "====================================================================================\n"
    "Welcome, connection established to the server. Below is a list of possible commands: \n"
-   "hello - Displays a greeting\n"
-   "1, 2, 3, 4, 5 - Displays unique information to the user\n"
-   "passwd - Not currently implemented, will allow the user to change a password\n"
-   "exit - Will disconnect the user\n"
-   "menu - Will display a list of available commands\n"
-   "====================================================================================";
+   "hello - Displays a greeting.\n"
+   "1, 2, 3, 4, 5 - Displays 5 unique facts about the c++ programming language!\n"
+   "passwd - Not currently implemented, will allow the user to change a password.\n"
+   "exit - Will disconnect the user.\n"
+   "menu - Will display a list of available commands.\n"
+   "====================================================================================\n"; 
+
+   std::string commands = "=======================================================================\n"
+   "Below is a list of possible commands: \n"
+   "hello - Displays a greeting.\n"
+   "1, 2, 3, 4, 5 - Displays 5 unique facts about the c++ programming language!\n"
+   "passwd - Not currently implemented, will allow the user to change a password.\n"
+   "exit - Will disconnect the user.\n"
+   "menu - Will display a list of available commands.\n"
+   "====================================================================================\n";
+
+   std::string incorrect = "=======================================================================\n"
+   "Your input did not match one of the possible choicse, please try again: \n"
+   "hello - Displays a greeting.\n"
+   "1, 2, 3, 4, 5 - Displays 5 unique facts about the c++ programming language!\n"
+   "passwd - Not currently implemented, will allow the user to change a password.\n"
+   "exit - Will disconnect the user.\n"
+   "menu - Will display a list of available commands.\n"
+   "====================================================================================\n";
+
+   bool secretMenu = false;
+
+   std::string secretMenuText = "=======================================================================\n"
+   "Your input did not match one of the possible choicse, please try again: \n"
+   "hello - Displays a greeting.\n"
+   "1, 2, 3, 4, 5 - Displays 5 unique facts about the c++ programming language!\n"
+   "passwd - Not currently implemented, will allow the user to change a password.\n"
+   "exit - Will disconnect the user.\n"
+   "menu - Will display a list of available commands.\n"
+   "uuddlrlrab - I see you've cracked the code... it will not be so easy next time!\n"
+   "====================================================================================\n";
+
 
    fd_set master; // Master FD list
    fd_set read_fds; // list used for select()
 
    int biggestFD = 0; // int used to keep track of the biggest FD yet for the select() call
    int new_sock = 0; // Used when there is a new socket
+   int select_result = 0; // Used to check output of select()
+   int addrlen = 0; // Used to call accept
 
 };
 
