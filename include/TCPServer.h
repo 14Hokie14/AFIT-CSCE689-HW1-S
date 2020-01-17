@@ -14,7 +14,7 @@ public:
    void shutdown();
 
 private:
- 
+   int sockFD; 
 
 
 };
