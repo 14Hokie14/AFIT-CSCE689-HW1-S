@@ -69,8 +69,6 @@ void TCPServer::sockBind(const char *ip_addr, short unsigned int port){
     inet_pton(AF_INET, ip_addr, &(this->address.sin_addr)); // Inserts the IP address as a string into the sockaddr_in struct
     this->address.sin_port = htons( port ); // htons is shorthand for Host-to-Network short
     
-    //std::cout << "here" << std::endl; 
-    
     // Now bind the socket, if it fails print an error message and exit
     if ( ( bind(this->server_sock, (struct sockaddr *)&this->address, sizeof(this->address)) ) < 0 ){
         perror("Failure in bind() in TCPServer.\n");
@@ -129,7 +127,7 @@ void TCPServer::zeroBuf(){
 * Helper method for listen call 
 **/
 void TCPServer::serverListen(){ 
-    if( listen(this->server_sock, 10) < 0){
+    if( listen(this->server_sock, 20) < 0){
         perror("Failure in listen() in TCPServer.\n");
         exit(EXIT_FAILURE);
     }
