@@ -150,6 +150,8 @@ void TCPServer::serverSelect(){
 
 /**
 * Helper function that will handle accepting a new client to our server
+*
+* <TODO> Add some sort of connection object
 **/
 void TCPServer::handleNewClient(){
     this->addrlen = sizeof(this->address); // set up addrlen for the accept call
@@ -166,7 +168,7 @@ void TCPServer::handleNewClient(){
             this->biggestFD = this->new_sock;
         }
         std::cout << "New connection on socket " << this->new_sock << std::endl; // Notify the server of the new connection
-        sockSend(this->new_sock, initMessage.c_str()); // Send the welcome message
+        //sockSend(this->new_sock, initMessage.c_str()); // Send the welcome message
     }
 }
 
@@ -188,7 +190,12 @@ void TCPServer::handleExistingClient(int i){
         FD_CLR(i, &(this->master)); // Remove the client socket from the master FD list
     } else {
         // Handle the data from the client
-        parseData(i);
+        //parseData(i);
+        // <TODO> change this 
+
+        // This is how you send something to socket i
+        const char* hello = "1000";
+        sockSend(i, hello);
     }
 }
 
@@ -308,6 +315,12 @@ void TCPServer::listenSvr() {
                 }
             }
         }
+
+        // <TODO> add logic here to do pollards rho 
+
+        // logic
+        // send string
+        // read string then do something with string
     } 
 }
 
